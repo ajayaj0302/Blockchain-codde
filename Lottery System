@@ -1,7 +1,9 @@
 pragma solidity >=0.5.13 <0.7.3;
+
 contract lotterySystem{
     address payable owner = msg.sender;
     bool lotteryPause;
+    
     struct participant{
         address payable  useraddress;
         uint256 fee;
@@ -54,5 +56,5 @@ function haltLottery(bool _lotterypause) public checkowner returns(string memory
     }
     return('Lottery is halted ');
 }
-    
+
 }
