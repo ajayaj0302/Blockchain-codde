@@ -1,0 +1,58 @@
+pragma solidity >=0.5.13 <0.7.3;
+contract lotterySystem{
+    address payable owner = msg.sender;
+    bool lotteryPause;
+    struct participant{
+        address payable  useraddress;
+        uint256 fee;
+        bool paid;
+    }
+    participant[] useraddr;
+    
+    function PaytoEntry() public payable{
+        require(lotteryPause != true,"Lottery is pause mode try after sometime");
+        require(checkaddr(msg.sender)==false,"Already participated");
+        require(msg.value >= 1 ether,"Not sufficient ether to entry");
+        useraddr.push() = participant(msg.sender,msg.value,true);
+    }
+    
+    function checkaddr(address payable _addr) private view returns(bool){
+        for(uint i=0;i < useraddr.length;i++){
+            if (useraddr[i].useraddress == _addr)
+            {
+                return useraddr[i].paid;
+                
+            }
+            }
+            return false;
+    }
+    
+    function generateWinner() public checkowner{
+        require(address(this).balance > 0,"No one got Lotteryticket");
+        uint256 random = uint256(keccak256(abi.encodePacked(block.difficulty,block.timestamp,msg.sender))) % useraddr.length;
+        (useraddr[random].useraddress).transfer(address(this).balance);
+        clearuserdetails();
+    }
+    
+    function clearuserdetails() private {
+        delete useraddr;
+    }
+    
+    function lotteryDetails() public view returns (uint256,uint256){
+        return(useraddr.length,address(this).balance);
+    }
+    
+    modifier checkowner(){
+        require(msg.sender == owner,"Only owner can generateWinner");
+        _;
+    }
+    
+function haltLottery(bool _lotterypause) public checkowner returns(string memory){
+    lotteryPause = _lotterypause;
+    if(lotteryPause != true){
+        return ('Lottery is On and filling faster');
+    }
+    return('Lottery is halted ');
+}
+    
+}
