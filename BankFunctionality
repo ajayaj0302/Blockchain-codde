@@ -1,0 +1,41 @@
+pragma solidity >=0.5.13 <0.7.3;
+contract bankFunctionality{
+    address payable owner=msg.sender;
+    uint256 count;
+    
+    struct userDetails{
+        address payable addr;
+        uint256 balance;
+        bool flag;
+    }
+    
+    mapping(address=>userDetails) customer_bank_details;
+     
+    function registeredUser(address payable _addr) public{
+        require((customer_bank_details[_addr]).flag == false,"Already registered user");
+        customer_bank_details[_addr] = customer_bank_details(_addr, 0, true);
+        count ++;
+    }
+    
+    function paytoBank() public payable{
+        require((customer_bank_details[msg.value])== true,"You are not registered yet");
+        (customer_bank_details[msg.value]).balance += msg.value;
+    }
+    
+    function withdrawfromAccount(address payable receiver,uint256 amt) public payable{
+        require((customer_bank_details[receiver]).flag== true,"You are not registered yet to bank");
+        require((customer_bank_details[msg.sender]).balance >= amt,"You don't have sufficient amount to withdrawfromAccount");
+        receiver.transfer(amt);
+        (customer_bank_details[msg.sender]).balance = (customer_bank_details[msg.sender]).balance -  msg.value;
+    }
+    
+     function customerDetails(address payable user_address) public view returns(uint256, address payable){
+        require (msg.sender == user_address,"You are not authorised to view details of this address");
+        return ((customer_bank_details[user_address]).balance, (customer_bank_details[user_address]).addr);
+    }
+    
+    function displabankDetails()public view returns(uint256,uint256){
+        require(msg.sender == owner,"Only the Owner has permission to view this");
+        return (this.balance,count);
+    }
+}
